@@ -58,7 +58,7 @@ namespace ProtoTypeMaker
             //sv_Main.MouseWheel += MainWindow_MouseWheel;
             scale = new ScaleTransform(1.0, 1.0,0.5,0.5);
             trans = new TranslateTransform(0, 0);
-
+            gd_Main.LayoutUpdated += Gd_Main_LayoutUpdated;
             TransformGroup group = new TransformGroup();
             group.Children.Add(scale);
           //  group.Children.Add(trans);
@@ -133,6 +133,15 @@ namespace ProtoTypeMaker
             btn_SaveXML.Click += btn_SaveXML_Click;
             btn_New.Click += btn_New_Click;
           //  icv_INk.EditingMode = InkCanvasEditingMode
+        }
+
+        private void Gd_Main_LayoutUpdated(object sender, EventArgs e)
+        {  //
+            //sv_Main.ScrollToVerticalOffset(sv_Main.VerticalOffset / scale.ScaleY);
+
+
+            //sv_Main.ScrollToHorizontalOffset(sv_Main.HorizontalOffset / scale.ScaleY);
+            //throw new NotImplementedException();
         }
 
         void btn_New_Click(object sender, RoutedEventArgs e)
@@ -275,42 +284,45 @@ namespace ProtoTypeMaker
 
         void MainWindow_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-         
-            if (e.Delta > 0)
+          //  if (enterItem != null)
             {
-
-                if (scale.ScaleX < 4.9)
+                if (e.Delta > 0)
                 {
-                    
-                    scale.ScaleX += 0.1;
-                    scale.ScaleY += 0.1;
+
+                    if (scale.ScaleX < 4.9)
+                    {
+
+                        scale.ScaleX += 0.1;
+                        scale.ScaleY += 0.1;
+                    }
                 }
-            }
-            else{
+                else {
 
-                if (scale.ScaleX > 0.3)
-                {
-                    
-                     
-                    scale.ScaleX -= 0.1;
-                    scale.ScaleY -= 0.1;
+                    if (scale.ScaleX > 0.3)
+                    {
+
+
+                        scale.ScaleX -= 0.1;
+                        scale.ScaleY -= 0.1;
+                    }
                 }
+
+                //Point relativePoint = enterItem.TransformToAncestor(sv_Main)
+                //                 .Transform(new Point(0, 0));
+                //sv_Main.ScrollToVerticalOffset(sv_Main.VerticalOffset / scale.ScaleY);
+
+
+                //sv_Main.ScrollToHorizontalOffset(sv_Main.HorizontalOffset / scale.ScaleY);
+
+                //oldCenter = e.GetPosition(gd_Main);
+                //Point point = ScaleP(e.GetPosition(gd_Main), new Point(this.ActualWidth / 2, this.ActualHeight / 2), scale.ScaleX, scale.ScaleY);
+
             }
-             ;
-
-
-
-             //sv_Main.ScrollToVerticalOffset(sv_Main.VerticalOffset -(oldCenter.Y - e.GetPosition(gd_Main).Y));
-             //sv_Main.ScrollToHorizontalOffset(sv_Main.HorizontalOffset - (oldCenter.X - e.GetPosition(gd_Main).X));
-
-             //oldCenter = e.GetPosition(gd_Main);
-            //Point point = ScaleP(e.GetPosition(gd_Main), new Point(this.ActualWidth / 2, this.ActualHeight / 2), scale.ScaleX, scale.ScaleY);
-
-
 
             //sv_Main.ScrollToHorizontalOffset(point.X);
             //sv_Main.ScrollToVerticalOffset(point.Y);
-            e.Handled = true;  
+            e.Handled = true;
+
         }
         public Point ScaleP(Point sourcePoint, Point centerPoint, double scaleX, double scaleY)
         {
@@ -374,6 +386,8 @@ namespace ProtoTypeMaker
 
                 image.MouseLeftButtonDown += image_MouseLeftButtonDown;
                 image.MouseMove += image_MouseMove;
+                image.MouseLeave += Image_MouseLeave;
+                image.MouseEnter += Image_MouseEnter;
                 image.MouseLeftButtonUp += image_MouseLeftButtonUp;
                 cv_ItemsContainer.Children.Add(image);
                 image.Tag = DateTime.Now.ToString("yyyyMMddhhmmssfff");
@@ -384,6 +398,17 @@ namespace ProtoTypeMaker
       
             
 
+        }
+
+        private void Image_MouseLeave(object sender, MouseEventArgs e)
+        {
+            enterItem = null;
+        }
+
+        AddItems enterItem = null;
+        private void Image_MouseEnter(object sender, MouseEventArgs e)
+        {
+            enterItem = sender as AddItems;
         }
 
         void image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -690,7 +715,10 @@ namespace ProtoTypeMaker
                             control.MouseLeftButtonDown += image_MouseLeftButtonDown;
                             control.MouseMove += image_MouseMove;
                             control.MouseLeftButtonUp += image_MouseLeftButtonUp;
-                            cv_ItemsContainer.Children.Add(control);
+
+                        control.MouseLeave += Image_MouseLeave;
+                        control.MouseEnter += Image_MouseEnter;
+                        cv_ItemsContainer.Children.Add(control);
                             Canvas.SetLeft(control, Convert.ToDouble(item.Element("LocationX").Value));
                             Canvas.SetTop(control, Convert.ToDouble(item.Element("LocationY").Value));
                         }
